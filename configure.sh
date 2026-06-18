@@ -313,6 +313,17 @@ case ${HOST_CC_MACHINE} in
             echo "#undef HAVE_VMM_H" >tenders/hvt/hvt_openbsd_config.h
         fi
         ;;
+    arm64-*darwin*|aarch64-*darwin*)
+        CONFIG_HOST_ARCH=aarch64 CONFIG_HOST=Darwin
+        # Apple clang emits Mach-O, not ELF, and macOS ships no GNU cross
+        # binutils, so building the target toolchain and bindings here needs
+        # an explicit ELF cross compiler. The tenders are Linux/BSD-only and
+        # are not built on macOS.
+        [ -z "${TARGET_CC}" ] && \
+            die "macOS host requires an ELF cross toolchain: set TARGET_CC" \
+                "(e.g. TARGET_CC='clang -target aarch64-linux-gnu')," \
+                "TARGET_LD and TARGET_OBJCOPY"
+        ;;
     *)
         die "Unsupported host toolchain: ${HOST_CC_MACHINE}"
         ;;
@@ -525,6 +536,15 @@ case ${CONFIG_HOST} in
                 die "gcc 9+ or clang required on DragonFly"
             fi
         fi
+        ;;
+    Darwin)
+        # Cross-building ELF unikernels from macOS: the LLVM cross tools
+        # (clang -target, ld.lld, llvm-objcopy) stand in for the GNU binutils
+        # Apple does not ship. Same ELF build-id/-no-pie handling as the Linux
+        # "cc as linker" case.
+        TARGET_LD="${TARGET_LD:-ld.lld}"
+        TARGET_OBJCOPY="${TARGET_OBJCOPY:-llvm-objcopy}"
+        TARGET_CC_LDFLAGS="-Wl,--build-id=none,-no-pie"
         ;;
     *)
         die "Unsupported host system: ${CONFIG_HOST}"

@@ -1,3 +1,8 @@
+## Unreleased
+
+- Support cross-building aarch64 unikernels on macOS using the LLVM cross
+  tools (#641 @samoht)
+
 ## v0.12.0 (2026-07-02)
 
 - Fix `solo5-hvt-debug` and disable capabilities on this specific binary
