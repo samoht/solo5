@@ -538,12 +538,24 @@ case ${CONFIG_HOST} in
         fi
         ;;
     Darwin)
-        # Cross-building ELF unikernels from macOS: the LLVM cross tools
-        # (clang -target, ld.lld, llvm-objcopy) stand in for the GNU binutils
-        # Apple does not ship. Same ELF build-id/-no-pie handling as the Linux
-        # "cc as linker" case.
+        # macOS cross-build: clang -target, ld.lld and llvm-objcopy stand in for
+        # the GNU binutils Apple lacks, same ELF build-id/-no-pie as the Linux
+        # "cc as linker" case. llvm-objcopy is keg-only (Homebrew) or versioned
+        # (MacPorts) and off PATH, so pin it to an absolute path below.
         TARGET_LD="${TARGET_LD:-ld.lld}"
         TARGET_OBJCOPY="${TARGET_OBJCOPY:-llvm-objcopy}"
+        if ! command -v "${TARGET_OBJCOPY}" >/dev/null 2>&1; then
+            for _llvmbin in \
+                "$(command -v brew >/dev/null 2>&1 && brew --prefix llvm 2>/dev/null)/bin" \
+                /opt/homebrew/opt/llvm/bin /usr/local/opt/llvm/bin \
+                /opt/local/libexec/llvm-*/bin; do
+                if [ -x "${_llvmbin}/${TARGET_OBJCOPY}" ]; then
+                    TARGET_OBJCOPY="${_llvmbin}/${TARGET_OBJCOPY}"
+                    break
+                fi
+            done
+            unset _llvmbin
+        fi
         TARGET_CC_LDFLAGS="-Wl,--build-id=none,-no-pie"
         ;;
     *)
