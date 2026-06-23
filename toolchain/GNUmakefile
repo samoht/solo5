@@ -36,7 +36,9 @@ $(V).SILENT:
 bin:
 	mkdir -p $@
 
-bin/$(CONFIG_TARGET_TRIPLE)-%: %.in | bin
+# Depend on Makeconf so a reconfigure that changes a tool path regenerates the
+# wrapper instead of leaving a stale one.
+bin/$(CONFIG_TARGET_TRIPLE)-%: %.in $(TOPDIR)/Makeconf | bin
 	@echo "SUBST $@"
 	sed -e 's!@@CONFIG_TARGET_ARCH@@!$(CONFIG_TARGET_ARCH)!g' \
 	    -e 's!@@CONFIG_TARGET_TRIPLE@@!$(CONFIG_TARGET_TRIPLE)!g' \
