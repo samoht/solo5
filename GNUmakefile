@@ -144,9 +144,6 @@ install-toolchain: build
 	    "{}" "$(TOOLCHAIN_INCDIR)/{}" \;
 	$(INSTALL) -m 0644 bindings/solo5_stub.o $(TOOLCHAIN_LIBDIR)
 	$(INSTALL) -m 0644 bindings/solo5_stub.lds $(TOOLCHAIN_LIBDIR)
-ifdef CONFIG_TARGET_LIBGCC
-	$(INSTALL) -m 0644 $(CONFIG_TARGET_LIBGCC) $(TOOLCHAIN_LIBDIR)/libgcc.a
-endif
 ifdef CONFIG_HVT
 	$(INSTALL) -m 0644 bindings/solo5_hvt.o $(TOOLCHAIN_LIBDIR)
 	$(INSTALL) -m 0644 bindings/solo5_hvt.lds $(TOOLCHAIN_LIBDIR)

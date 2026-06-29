@@ -8,7 +8,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Install dependencies
-        run: brew install llvm lld aarch64-elf-gcc
+        run: brew install llvm lld
       - name: Build
         run: |
           export PATH="$(brew --prefix llvm)/bin:$PATH"

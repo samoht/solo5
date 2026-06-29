@@ -29,7 +29,7 @@ depexts: [
   ["kernel-headers"] {os-distribution = "rhel"}
   ["linux-libc-dev"] {os-family = "debian"}
   ["gcc-aarch64-linux-gnu"] {os-family = "debian"}
-  ["llvm" "lld" "aarch64-elf-gcc"] {os = "macos" & os-distribution = "homebrew"}
+  ["llvm" "lld"] {os = "macos" & os-distribution = "homebrew"}
 ]
 available: [
   ((arch != "arm64") & (os = "linux" & os-family = "debian"))

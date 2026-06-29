@@ -583,30 +583,6 @@ fi
 echo "${prog_NAME}: Using ${TARGET_LD} for target linker"
 echo "${prog_NAME}: Using ${TARGET_OBJCOPY} for target objcopy"
 
-# cc-as-linker links -lgcc. A gcc, or clang with compiler-rt, ships it; clang
-# without compiler-rt for the target (e.g. macOS) does not, so fall back to a
-# bare-metal gcc's libgcc and bundle it.
-echo -n "${prog_NAME}: Checking for the target runtime (libgcc): "
-CC_LIBGCC="$(${TARGET_CC} -print-libgcc-file-name 2>/dev/null)"
-if [ -f "${CC_LIBGCC}" ]; then
-    echo "${CC_LIBGCC} (from the compiler)"
-    TARGET_LIBGCC=
-elif TARGET_LIBGCC="$("${TARGET_ARCH}-elf-gcc" -print-libgcc-file-name 2>/dev/null)" &&
-     [ -f "${TARGET_LIBGCC}" ]; then
-    echo "${TARGET_LIBGCC} (bundled)"
-elif [ "${CONFIG_HOST}" = "Darwin" ]; then
-    # macOS clang has no libgcc for the cross target and ships none, so it must
-    # be installed; fail loudly there.
-    echo "not found"
-    die "${TARGET_CC} provides no target runtime library (libgcc)." \
-        "Install ${TARGET_ARCH}-elf-gcc (\`brew install ${TARGET_ARCH}-elf-gcc\`)" \
-        "or set TARGET_CC."
-else
-    # Native hosts (Linux, *BSD) resolve -lgcc through the compiler itself.
-    echo "none (the compiler provides its own)"
-    TARGET_LIBGCC=
-fi
-
 TARGET_TRIPLE="${TARGET_ARCH}-solo5-none-static"
 echo "${prog_NAME}: Target toolchain triple is ${TARGET_TRIPLE}"
 
@@ -653,7 +629,6 @@ CONFIG_TARGET_LD=${TARGET_LD}
 CONFIG_TARGET_LD_LDFLAGS=${TARGET_LD_LDFLAGS}
 CONFIG_TARGET_LD_MAX_PAGE_SIZE=${TARGET_LD_MAX_PAGE_SIZE}
 CONFIG_TARGET_OBJCOPY=${TARGET_OBJCOPY}
-CONFIG_TARGET_LIBGCC=${TARGET_LIBGCC}
 EOM
 
 #
