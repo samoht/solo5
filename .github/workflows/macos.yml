@@ -1,0 +1,21 @@
+name: macOS
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  Build:
+    name: ARM64
+    runs-on: macos-15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: brew install llvm lld
+      - name: Build
+        run: |
+          ./configure.sh --path-prepend="$(brew --prefix llvm)/bin:" \
+            --disable-elftool --prefix="$PWD/_install"
+          make V=1
+          make V=1 install
